@@ -1,0 +1,127 @@
+﻿<Window x:Class="Sentio.WcfTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Sentio Wcf Client" 
+        Height="800" 
+        Width="1400"
+        DataContext="{Binding Main, Source={StaticResource Locator}}"
+        DataContextChanged="MainWindow_OnDataContextChanged">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0" >
+            <TabItem Header="Observe">
+                <Grid DataContext="{Binding Main, Source={StaticResource Locator}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0"  Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Button Content="Vision" Width="100" Height="50" Command="{Binding CmdSelectModule}" CommandParameter="Vision" Margin="5"/>
+                        <Button Content="Wafermap" Width="100" Height="50" Command="{Binding CmdSelectModule}" CommandParameter="Wafermap" Margin="5"/>
+                        <Button Content="AuxSites" Width="100" Height="50" Command="{Binding CmdSelectModule}" CommandParameter="AuxSites" Margin="5"/>
+                        <Button Content="Qalibria" Width="100" Height="50" Command="{Binding CmdSelectModule}" CommandParameter="Qalibria" Margin="5"/>
+                        <Button Content="Setup" Width="100" Height="50" Command="{Binding CmdSelectModule}" CommandParameter="Setup" Margin="5"/>
+                        <Button Content="Service" Width="100" Height="50" Command="{Binding CmdSelectModule}" CommandParameter="Service" Margin="5"/>
+                        <Button Content="Dashboard" Width="100" Height="50" Command="{Binding CmdSelectModule}" CommandParameter="Dashboard" Margin="5"/>
+
+                        <!-- Active Sentio Module -->
+                        <TextBlock FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} module is active">
+                                <Binding Path="ActiveModule" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                        </TextBlock>
+
+                        <Button Content="Grab Active Module" Width="100" Height="50" Margin="5" Command="{Binding CmdGrabActiveModule}"/>
+                    </StackPanel>
+
+                    <Border Grid.Row="1" Background="Black">
+                        <Image  VerticalAlignment="Stretch" Source="{Binding ActiveModuleSnapshot}"/>
+                    </Border>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Control">
+                <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="AntiqueWhite" Margin="10">
+
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <Button Content="Show Hint" Width="100" Height="50" Command="{Binding CmdShowHint}"  Margin="5"/>
+                        <TextBox Text="{Binding Hint}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5" Width="100"/>
+                    </StackPanel>
+
+                    <Button HorizontalAlignment="Left" Content="Step First Die" Width="100" Height="50" Margin="15" Command="{Binding CmdStepFirstDie}"/>
+                    <Button HorizontalAlignment="Left" Content="List Module Properties" Width="100" Height="50" Margin="15" Command="{Binding CmdListModuleProperties}"/>
+                    <Button HorizontalAlignment="Left" Content="Set Light" Width="100" Height="50" Margin="15" Command="{Binding CmdSetLight}"/>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Vision">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Active Camera"/>
+                        <StackPanel Orientation="Vertical" Margin="10">
+                            <Button Content="Scope" Width="100" Height="50" Command="{Binding CmdSwitchCamera}" CommandParameter="Scope" Margin="5"/>
+                            <Button Content="Scope2" Width="100" Height="50" Command="{Binding CmdSwitchCamera}" CommandParameter="Scope2" Margin="5"/>
+                            <Button Content="Chuck" Width="100" Height="50" Command="{Binding CmdSwitchCamera}" CommandParameter="Chuck" Margin="5"/>
+                            <Button Content="OffAxis" Width="100" Height="50" Command="{Binding CmdSwitchCamera}" CommandParameter="OffAxis" Margin="5"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Snapshot"/>
+                        <Button Content="Grab Scope Image" Width="100" Height="50" Margin="5" Command="{Binding CmdGrabImage}"/>
+                    </StackPanel>
+
+                    <Border Grid.Column="1" Background="Black">
+                        <Image Source="{Binding ImageSource}"/>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="1" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <TextBlock  Text="WCF Session and Events"/>
+            <TextBlock HorizontalAlignment="Center" 
+                       VerticalAlignment="Center" 
+                       Margin="50 0 0 0"
+                       Text="{Binding SentioVersion, FallbackValue='not connected', TargetNullValue='not connected'}" 
+                       TextAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="0" Grid.Row="1">
+                <Button Content="Open Service" Width="100" Height="50" Command="{Binding CmdConnect}" Margin="5"/>
+                <Button Content="Close Service" Width="100" Height="50" Command="{Binding CmdDisconnect}" Margin="5"/>
+                <CheckBox IsChecked="{Binding IsInRemoteMode}" Content="Remote Mode" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <CheckBox IsChecked="{Binding ShowClientPanel}" Content="Client Panel" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            </StackPanel>
+            <ListBox 
+                Grid.Row="1"
+                Grid.Column="1"
+                Height="200"
+                HorizontalAlignment="Stretch" 
+                Background="WhiteSmoke" 
+                Margin="5"
+                x:Name="ListBox"
+                ItemsSource="{Binding LogLines}">
+            </ListBox>
+        </Grid>
+    </Grid>
+</Window>
