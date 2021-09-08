@@ -4,7 +4,7 @@ This archive contain a sample project demonstrating how to connect to the MPI Pr
 ![](https://www.mpi-corporation.com/wp-content/uploads/2019/12/1.-TS3500-SE-with-WaferWallet_frontview.jpg)
 
 # Prerequisites
-The Minimum required SENTIO version is 3.5. The SENTIO WCF Server must be active. This is normally the case. In order to check whether the WCF server is active go to the config.xml (C:\ProgramData\MPI Corporation\SENTIO\config\config.xml) and check wether you see this node.
+The Minimum required SENTIO version is 3.5. The SENTIO WCF Server must be active. This is normally the case. In order to check whether the WCF server is active go to the config.xml (C:\ProgramData\MPI Corporation\SENTIO\config\config.xml) and check wether you see this node:
 
 ```xml
   <Main>
@@ -12,3 +12,6 @@ The Minimum required SENTIO version is 3.5. The SENTIO WCF Server must be active
     <WcfServer Uri="net.tcp://localhost:35556/Sentio" />
     ...
 ```
+
+# Use
+SENTIO's WCF server allows you to write client application with tight SENTIO integration. A client application can add buttons to SENTIO's Client bar and interface with SENTIO in a direct manner (i.e. obtain camera images).
