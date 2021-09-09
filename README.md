@@ -14,4 +14,4 @@ The Minimum required SENTIO version is 3.5. The SENTIO WCF Server must be active
 ```
 
 # Use Case
-SENTIO's WCF server allows to write client application with tight SENTIO integration. A WCF client application can add buttons to SENTIO's Client bar, interface with SENTIO in a direct manner (i.e. obtain camera images) and inject its own remote commands into SENTIO.
+SENTIO's WCF server enables you to write client application with tight SENTIO integration. A WCF client application can add buttons to SENTIO's Client bar, interface with SENTIO in a direct manner (i.e. obtain camera images) and inject own remote commands into SENTIO.
