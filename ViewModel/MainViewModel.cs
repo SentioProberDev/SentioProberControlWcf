@@ -74,25 +74,25 @@ namespace Sentio.WcfTest.ViewModel
 
         private void SetModuleProperties()
         {
-            LogLines.Clear();
-
             try
             {
+                if ((int)SentioCompatLevel <= (int)SentioCompatibilityLevel.Sentio_3_6)
+                {
+                    throw new NotSupportedException("SENTIO Version 3.6 or higher needed! (Set Compatibility level accordingly)");
+                }
+
+                LogLines.Clear();
+
                 LogLines.Add("The following examples demonstrate how to set module properties");
 
                 LogLines.Add("Setting light");
-                Sentio.SetModuleProperty(SentioModules.Vision, "light",
-                    new SentioVariantData(Camera.Scope.ToString()),
-                    new SentioVariantData(100));
+                Sentio.SetModuleProperty(SentioModules.Vision, "light", new SentioVariantData(Camera.Scope.ToString()), new SentioVariantData(100));
 
                 LogLines.Add("Setting gain");
-                Sentio.SetModuleProperty(SentioModules.Vision, "gain",
-                    new SentioVariantData(Camera.Scope.ToString()),
-                    new SentioVariantData(0.3));
+                Sentio.SetModuleProperty(SentioModules.Vision, "gain", new SentioVariantData(Camera.Scope.ToString()), new SentioVariantData(0.3));
 
                 LogLines.Add("Setting jpeg_quality");
-                Sentio.SetModuleProperty(SentioModules.Vision, "jpeg_quality",
-                    new SentioVariantData(100));
+                Sentio.SetModuleProperty(SentioModules.Vision, "jpeg_quality", new SentioVariantData(100));
 
                 LogLines.Add("Done");
             }
@@ -109,56 +109,73 @@ namespace Sentio.WcfTest.ViewModel
                 // do with SENTIO but with the connection as a whole.
                 LogLines.Add(exc.Message);
             }
+            catch (Exception exc)
+            {
+                // ANY error from the wcf client goes here
+                LogLines.Add(exc.Message);
+            }
         }
 
         private void ListModulePropertiesImpl()
         {
-            LogLines.Clear();
-
-            var visionProp = new Dictionary<string, string>
+            try
             {
-                // Jpeg Quality in percent when saving images
-                { "jpeg_quality", "" },
+                if ((int)SentioCompatLevel <= (int)SentioCompatibilityLevel.Sentio_3_6)
+                {
+                    throw new NotSupportedException("SENTIO Version 3.6 or higher needed! (Set Compatibility level accordingly)");
+                }
 
-                // Camera Parameters, The parameter refers to the camera.
-                // available cameras are: scope, offaxis, chuck, vce01, scope2
-                { "image_size", "scope" },
-                { "light", "scope" },
-                { "gain", "scope" },
-                { "gain_min", "scope" },
-                { "gain_max", "scope" },
-                { "exposure", "scope" },
-                { "exposure_min", "scope" },
-                { "exposure_max", "scope" },
-                { "calib", "scope" },
+                LogLines.Clear();
 
-                // size of the camera's region of interest in µm
-                { "roi_size", "scope"}
-            };
+                var visionProp = new Dictionary<string, string>
+                {
+                    // Jpeg Quality in percent when saving images
+                    { "jpeg_quality", "" },
 
-            foreach (var it in visionProp)
+                    // Camera Parameters, The parameter refers to the camera.
+                    // available cameras are: scope, offaxis, chuck, vce01, scope2
+                    { "image_size", "scope" },
+                    { "light", "scope" },
+                    { "gain", "scope" },
+                    { "gain_min", "scope" },
+                    { "gain_max", "scope" },
+                    { "exposure", "scope" },
+                    { "exposure_min", "scope" },
+                    { "exposure_max", "scope" },
+                    { "calib", "scope" },
+
+                    // size of the camera's region of interest in µm
+                    { "roi_size", "scope" }
+                };
+
+                foreach (var it in visionProp)
+                {
+                    try
+                    {
+                        var propName = it.Key;
+                        var propArg = it.Value;
+
+                        var prop = Sentio.GetModuleProperty(SentioModules.Vision, propName, propArg);
+                        LogLines.Add($"{it.Key} - {prop} ({prop.Type})");
+                    }
+                    catch (FaultException<SentioErrorDetails> exc)
+                    {
+                        // This exception should be the standard for transmitting
+                        // non sentio runtime errors
+                        LogLines.Add(exc.Detail.Message);
+                        LogLines.Add(exc.Detail.Details);
+                    }
+                    catch (FaultException exc)
+                    {
+                        // This may be related to the wcf underpinnings and have nothing to
+                        // do with SENTIO but with the connection as a whole.
+                        LogLines.Add(exc.Message);
+                    }
+                }
+            }
+            catch (Exception exc)
             {
-                try
-                {
-                    var propName = it.Key;
-                    var propArg = it.Value;
-
-                    var prop = Sentio.GetModuleProperty(SentioModules.Vision, propName, propArg);
-                    LogLines.Add($"{it.Key} - {prop} ({prop.Type})");
-                }
-                catch (FaultException<SentioErrorDetails> exc)
-                {
-                    // This exception should be the standard for transmitting
-                    // non sentio runtime errors
-                    LogLines.Add(exc.Detail.Message);
-                    LogLines.Add(exc.Detail.Details);
-                }
-                catch (FaultException exc)
-                {
-                    // This may be related to the wcf underpinnings and have nothing to
-                    // do with SENTIO but with the connection as a whole.
-                    LogLines.Add(exc.Message);
-                }
+                LogLines.Add(exc.Message);
             }
         }
 
@@ -504,7 +521,7 @@ namespace Sentio.WcfTest.ViewModel
                 RemoteCommandResponse resp = await Sentio.ExecuteRemoteCommand("map:step_first_die", 0);
                 if (resp.ErrorCode != 0)
                 {
-                    // Error!
+                    LogLines.Add(resp.Message);
                 }
             }
             catch (Exception exc)
@@ -526,7 +543,7 @@ namespace Sentio.WcfTest.ViewModel
                 RemoteCommandResponse resp = await Sentio.ExecuteRemoteCommand("map:step_next_die", null);
                 if (resp.ErrorCode != 0)
                 {
-                    // Error!
+                    LogLines.Add(resp.Message);
                 }
             }
             catch (Exception exc)

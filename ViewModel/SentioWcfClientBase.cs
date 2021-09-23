@@ -11,7 +11,6 @@ using Sentio.Contracts.Enumerations;
 using Sentio.Contracts.Helper;
 
 // ReSharper disable IdentifierTypo
-// ReSharper disable LocalizableElement
 // ReSharper disable SuspiciousTypeConversion.Global
 
 
@@ -34,6 +33,10 @@ namespace Sentio.WcfTest.ViewModel
         private InstanceContext _communicationObject;
 
         private SentioSessionInfo _session;
+
+        private SentioCompatibilityLevel _sentioCompateLevel = SentioCompatibilityLevel.Default;
+
+        public SentioCompatibilityLevel SentioCompatLevel => _sentioCompateLevel;
 
         public SentioModules ActiveModule
         {
@@ -127,12 +130,20 @@ namespace Sentio.WcfTest.ViewModel
                 Sentio.AsClientChannel().Faulted += SentioChannelFaulted;
                 Sentio.AsClientChannel().Closed += SentioChannelClosed;
 
-                Sentio.OpenWcfSession(clientName, SentioCompatibilityLevel.Sentio_3_6);
+                // Set the compatibility level 
+//                _sentioCompateLevel = SentioCompatibilityLevel.Sentio_3_6;
                 
+                Sentio.OpenWcfSession(clientName, _sentioCompateLevel);
+
                 SentioVersion = Sentio.Version;
                 ActiveModule = Sentio.ActiveModule;
-                Session = Sentio.Session;
                 IsInRemoteMode = Sentio.IsInRemoteMode;
+
+                // Session info was added in SENTIO 3.6
+                if ((int)_sentioCompateLevel >= (int)SentioCompatibilityLevel.Sentio_3_6)
+                {
+                    Session = Sentio.Session;
+                }
 
                 Sentio.SetupClientPanel(ClientUi);
                 if (ClientUi.Count >= 0)
