@@ -67,9 +67,16 @@ namespace Sentio.WcfTest.ViewModel
 
         private void CmdConnectImpl()
         {
-            Connect("Sentio WCF Client", "wcf_test");
-            LogLines.Add($"Session: User={Session.User}; AccessLevel={Session.AccessLevel}");
-            LogLines.Add($"ActiveModule: {ActiveModule}");
+            try
+            {
+                Connect("Sentio WCF Client", "wcf_test");
+                LogLines.Add($"Session: User={Session.User}; AccessLevel={Session.AccessLevel}");
+                LogLines.Add($"ActiveModule: {ActiveModule}");
+            }
+            catch (Exception exc)
+            {
+                LogLines.Add(exc.Message);
+            }
         }
 
         private void SetModuleProperties()

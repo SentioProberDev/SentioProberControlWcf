@@ -34,9 +34,9 @@ namespace Sentio.WcfTest.ViewModel
 
         private SentioSessionInfo _session;
 
-        private SentioCompatibilityLevel _sentioCompateLevel = SentioCompatibilityLevel.Default;
+        private SentioCompatibilityLevel _desiredSentioCompateLevel = SentioCompatibilityLevel.Default;
 
-        public SentioCompatibilityLevel SentioCompatLevel => _sentioCompateLevel;
+        public SentioCompatibilityLevel SentioCompatLevel => _desiredSentioCompateLevel;
 
         public SentioModules ActiveModule
         {
@@ -130,17 +130,24 @@ namespace Sentio.WcfTest.ViewModel
                 Sentio.AsClientChannel().Faulted += SentioChannelFaulted;
                 Sentio.AsClientChannel().Closed += SentioChannelClosed;
 
-                // Set the compatibility level 
-//                _sentioCompateLevel = SentioCompatibilityLevel.Sentio_3_6;
-                
-                Sentio.OpenWcfSession(clientName, _sentioCompateLevel);
-
+                _desiredSentioCompateLevel = SentioCompatibilityLevel.Sentio_3_6;
+                Sentio.OpenWcfSession(clientName, _desiredSentioCompateLevel);
                 SentioVersion = Sentio.Version;
+
+                // Optional:
+                // Check wether SENTIO actually supports the desired compat level
+                var actualSentioCompatLevel = SentioInteropHelper.CompatLevelFromVersion(SentioVersion);
+                if ((int)_desiredSentioCompateLevel > (int)actualSentioCompatLevel)
+                {
+                    throw new InvalidOperationException(
+                        $"The connected SENTIO version does not support the compatibility level \"{_desiredSentioCompateLevel}\"");
+                }
+
                 ActiveModule = Sentio.ActiveModule;
                 IsInRemoteMode = Sentio.IsInRemoteMode;
 
                 // Session info was added in SENTIO 3.6
-                if ((int)_sentioCompateLevel >= (int)SentioCompatibilityLevel.Sentio_3_6)
+                if ((int)_desiredSentioCompateLevel >= (int)SentioCompatibilityLevel.Sentio_3_6)
                 {
                     Session = Sentio.Session;
                 }
